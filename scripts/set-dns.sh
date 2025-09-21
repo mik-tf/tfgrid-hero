@@ -69,17 +69,17 @@ display_dns_requirements() {
     log_info "DNS Configuration Required for Hero App"
     echo ""
     echo "Domain: $DOMAIN_NAME"
-    echo "Gateway IP: $GATEWAY_IP"
+    echo "Gateway IP: $VM_IP"
     echo ""
     echo "Please create the following DNS A records with your DNS provider:"
     echo ""
     echo "┌─────────────────────────────────────────────────────────────┐"
     echo "│ Record Type │ Name                  │ Value          │ TTL   │"
     echo "├─────────────┼───────────────────────┼────────────────┼───────┤"
-    printf "│ A           │ %-21s │ %-14s │ 300   │\n" "$DOMAIN_NAME" "$GATEWAY_IP"
-    printf "│ A           │ %-21s │ %-14s │ 300   │\n" "api.$DOMAIN_NAME" "$GATEWAY_IP"
-    printf "│ A           │ %-21s │ %-14s │ 300   │\n" "files.$DOMAIN_NAME" "$GATEWAY_IP"
-    printf "│ A           │ %-21s │ %-14s │ 300   │\n" "ws.$DOMAIN_NAME" "$GATEWAY_IP"
+    printf "│ A           │ %-21s │ %-14s │ 300   │\n" "$DOMAIN_NAME" "$VM_IP"
+    printf "│ A           │ %-21s │ %-14s │ 300   │\n" "api.$DOMAIN_NAME" "$VM_IP"
+    printf "│ A           │ %-21s │ %-14s │ 300   │\n" "files.$DOMAIN_NAME" "$VM_IP"
+    printf "│ A           │ %-21s │ %-14s │ 300   │\n" "ws.$DOMAIN_NAME" "$VM_IP"
     echo "└─────────────────────────────────────────────────────────────┘"
     echo ""
     log_warning "Note: DNS propagation can take 5-30 minutes"
@@ -100,11 +100,11 @@ test_dns_resolution() {
         if [ -z "$resolved_ip" ]; then
             log_error "❌ $domain does not resolve to any IP"
             all_resolved=false
-        elif [ "$resolved_ip" != "$GATEWAY_IP" ]; then
-            log_error "❌ $domain resolves to $resolved_ip (expected $GATEWAY_IP)"
+        elif [ "$resolved_ip" != "$VM_IP" ]; then
+            log_error "❌ $domain resolves to $resolved_ip (expected $VM_IP)"
             all_resolved=false
         else
-            log_success "✅ $domain correctly resolves to $GATEWAY_IP"
+            log_success "✅ $domain correctly resolves to $VM_IP"
         fi
     done
 
