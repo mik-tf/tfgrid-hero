@@ -76,6 +76,8 @@ resource "grid_deployment" "hero" {
       HERO_ROLE = "app"
     }
 
+    rootfs_size = var.storage_disk * 1024  # Convert GB to MB
+
     publicip = true
   }
 }
@@ -95,6 +97,12 @@ variable "memory" {
   type        = number
   default     = 4096
   description = "Memory in MB for the VM"
+}
+
+variable "storage_disk" {
+  type        = number
+  default     = 200
+  description = "Storage VM disk size in GB"
 }
 
 variable "SSH_KEY" {
