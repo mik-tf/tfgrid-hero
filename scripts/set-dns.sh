@@ -71,15 +71,12 @@ display_dns_requirements() {
     echo "Domain: $DOMAIN_NAME"
     echo "Gateway IP: $VM_IP"
     echo ""
-    echo "Please create the following DNS A records with your DNS provider:"
+    echo "Please create the following DNS A record with your DNS provider:"
     echo ""
     echo "┌─────────────────────────────────────────────────────────────┐"
     echo "│ Record Type │ Name                  │ Value          │ TTL   │"
     echo "├─────────────┼───────────────────────┼────────────────┼───────┤"
     printf "│ A           │ %-21s │ %-14s │ 300   │\n" "$DOMAIN_NAME" "$VM_IP"
-    printf "│ A           │ %-21s │ %-14s │ 300   │\n" "api.$DOMAIN_NAME" "$VM_IP"
-    printf "│ A           │ %-21s │ %-14s │ 300   │\n" "files.$DOMAIN_NAME" "$VM_IP"
-    printf "│ A           │ %-21s │ %-14s │ 300   │\n" "ws.$DOMAIN_NAME" "$VM_IP"
     echo "└─────────────────────────────────────────────────────────────┘"
     echo ""
     log_warning "Note: DNS propagation can take 5-30 minutes"
@@ -90,7 +87,7 @@ display_dns_requirements() {
 test_dns_resolution() {
     log_info "Testing DNS resolution..."
 
-    local domains=("$DOMAIN_NAME" "api.$DOMAIN_NAME" "files.$DOMAIN_NAME" "ws.$DOMAIN_NAME")
+    local domains=("$DOMAIN_NAME")
     local all_resolved=true
 
     for domain in "${domains[@]}"; do
@@ -109,10 +106,10 @@ test_dns_resolution() {
     done
 
     if [ "$all_resolved" = true ]; then
-        log_success "All DNS records are correctly configured!"
+        log_success "DNS record is correctly configured!"
         return 0
     else
-        log_error "Some DNS records are not configured correctly."
+        log_error "DNS record is not configured correctly."
         return 1
     fi
 }

@@ -107,8 +107,12 @@ generate_inventory() {
             VM_ANSIBLE_IP="$VM_MYC_IP"
             log_info "Using Mycelium IP for Ansible connectivity"
             ;;
+        "ipv4")
+            VM_ANSIBLE_IP="$VM_PUBLIC_IP"
+            log_info "Using IPv4 public IP for Ansible connectivity"
+            ;;
         *)
-            log_error "Invalid MAIN_NETWORK: ${MAIN_NETWORK}. Use 'wireguard' or 'mycelium'"
+            log_error "Invalid MAIN_NETWORK: ${MAIN_NETWORK}. Use 'wireguard', 'mycelium', or 'ipv4'"
             exit 1
             ;;
     esac
