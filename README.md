@@ -38,6 +38,11 @@ This repository contains the infrastructure and configuration for deploying the 
    make deploy
    ```
 
+   **Quick redeploy (if infrastructure exists)**:
+   ```bash
+   make quick
+   ```
+
    Or step by step:
    ```bash
    make infrastructure  # Deploy VM

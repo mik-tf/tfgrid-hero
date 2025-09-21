@@ -11,6 +11,7 @@ help:
 	@echo "🎯 Main Commands:"
 	@echo "  make all             - Complete Hero app deployment (default)"
 	@echo "  make deploy          - Deploy complete Hero app to TFGrid"
+	@echo "  make quick           - Quick redeploy (assumes infrastructure exists)"
 	@echo "  make deploy-auto     - Deploy without confirmation prompts"
 	@echo "  make redeploy        - Redeploy Hero app services (after infrastructure exists)"
 	@echo "  make infrastructure  - Deploy TFGrid infrastructure only"
@@ -49,6 +50,10 @@ help:
 
 # Complete deployment workflow
 deploy: infrastructure inventory wg platform
+
+# Quick deployment (assumes infrastructure is already deployed)
+quick: inventory wg set-dns platform
+	@echo "⚡ Quick Hero app deployment completed!"
 	@echo "🎉 Hero app deployment completed successfully!"
 	@echo ""
 	@echo "📍 Access your Hero app:"
