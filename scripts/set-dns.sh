@@ -54,14 +54,14 @@ get_gateway_ip() {
         exit 1
     fi
 
-    GATEWAY_IP=$($TERRAFORM_CMD output -raw gateway_public_ip 2>/dev/null || echo "")
-    if [ -z "$GATEWAY_IP" ]; then
-        log_error "Gateway public IP not found. Run 'make infrastructure' first."
+    VM_IP=$($TERRAFORM_CMD output -raw vm_public_ip 2>/dev/null || echo "")
+    if [ -z "$VM_IP" ]; then
+        log_error "VM public IP not found. Run 'make infrastructure' first."
         exit 1
     fi
 
     # Strip subnet mask if present (e.g., 185.206.122.150/24 → 185.206.122.150)
-    GATEWAY_IP=$(echo "$GATEWAY_IP" | cut -d'/' -f1)
+    VM_IP=$(echo "$VM_IP" | cut -d'/' -f1)
 }
 
 # Display DNS requirements
