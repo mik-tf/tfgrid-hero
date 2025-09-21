@@ -25,6 +25,7 @@ help:
 	@echo ""
 	@echo "🔧 Development Commands:"
 	@echo "  make inventory       - Generate Ansible inventory from infrastructure"
+	@echo "  make scripts-permissions - Fix execute permissions on scripts"
 	@echo "  make health          - Check service health"
 	@echo "  make address         - Show VM addresses and access information"
 	@echo "  make ping            - Test connectivity to VMs"
@@ -117,6 +118,12 @@ inventory:
 wg:
 	@echo "🔐 Setting up WireGuard connection..."
 	@./scripts/wg.sh
+
+# Fix script permissions
+scripts-permissions:
+	@echo "🔧 Setting execute permissions on scripts..."
+	@chmod +x scripts/*.sh
+	@echo "✅ Script permissions fixed"
 
 # Deploy Hero app services with Ansible
 platform:
