@@ -1,0 +1,75 @@
+---
+# Redis Role - Install and configure Redis servers
+
+- name: Install Redis
+  apt:
+    name: redis-server
+    state: present
+    update_cache: yes
+
+- name: Create Redis data directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: redis
+    group: redis
+    mode: '0755'
+  loop:
+    - /var/lib/redis/6379
+    - /var/lib/redis/6381
+    - /var/log/redis
+
+- name: Configure Redis on port 6379
+  template:
+    src: redis-6379.conf.j2
+    dest: /etc/redis/redis-6379.conf
+    mode: '0644'
+  notify: restart redis 6379
+
+- name: Configure Redis on port 6381
+  template:
+    src: redis-6381.conf.j2
+    dest: /etc/redis/redis-6381.conf
+    mode: '0644'
+  notify: restart redis 6381
+
+- name: Create systemd service for Redis 6379
+  template:
+    src: redis-6379.service.j2
+    dest: /etc/systemd/system/redis-6379.service
+    mode: '0644'
+  notify:
+    - reload systemd
+    - restart redis 6379
+
+- name: Create systemd service for Redis 6381
+  template:
+    src: redis-6381.service.j2
+    dest: /etc/systemd/system/redis-6381.service
+    mode: '0644'
+  notify:
+    - reload systemd
+    - restart redis 6381
+
+- name: Enable and start Redis services
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+    daemon_reload: yes
+  loop:
+    - redis-6379
+    - redis-6381
+
+- name: Verify Redis installations
+  command: redis-cli -p {{ item }} ping
+  register: redis_ping
+  changed_when: false
+  loop:
+    - 6379
+    - 6381
+
+- name: Display Redis ping results
+  debug:
+    msg: "Redis on port {{ item.item }}: {{ item.stdout }}"
+  loop: "{{ redis_ping.results }}"

@@ -1,0 +1,34 @@
+---
+# Nginx Gateway Role - Configure nginx as gateway with SSL support
+
+- name: Install nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+
+- name: Install certbot for SSL (if SSL enabled)
+  apt:
+    name:
+      - certbot
+      - python3-certbot-nginx
+    state: present
+  when: enable_ssl | default(false) | bool
+
+- name: Configure nginx for SSL (if enabled)
+  block:
+    - name: Obtain SSL certificate
+      command: certbot --nginx -d {{ domain_name }} --email {{ ssl_email }} --agree-tos --non-interactive{% if ssl_staging | default(false) %} --staging{% endif %}
+      register: certbot_result
+      changed_when: "'Congratulations' in certbot_result.stdout"
+
+    - name: Display certbot result
+      debug:
+        msg: "{{ certbot_result.stdout }}"
+  when: enable_ssl | default(false) | bool
+
+- name: Ensure nginx is running
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes

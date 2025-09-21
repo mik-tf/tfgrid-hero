@@ -1,0 +1,9 @@
+---
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: restart herolib
+  systemd:
+    name: herolib
+    state: restarted

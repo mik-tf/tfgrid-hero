@@ -1,0 +1,10 @@
+---
+- name: Deploy Hero App
+  hosts: hero
+  become: yes
+  roles:
+    - common
+    - redis
+    - herolib_backend
+    - ui_colab_frontend
+    - nginx_gateway

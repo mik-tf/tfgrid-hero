@@ -1,0 +1,14 @@
+---
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: restart redis 6379
+  systemd:
+    name: redis-6379
+    state: restarted
+
+- name: restart redis 6381
+  systemd:
+    name: redis-6381
+    state: restarted

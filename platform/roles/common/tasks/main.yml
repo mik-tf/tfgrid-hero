@@ -1,0 +1,221 @@
+---
+# Common Role - Tasks that run on all VMs
+# This role sets up the base environment for all Hero services
+
+- name: Update system packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+    autoremove: yes
+    autoclean: yes
+  tags: [system, update]
+
+- name: Install essential system packages
+  apt:
+    name:
+      - curl
+      - wget
+      - unzip
+      - git
+      - htop
+      - vim
+      - jq
+      - net-tools
+      - dnsutils
+      - tcpdump
+      - ufw
+      - fail2ban
+      - logrotate
+      - rsync
+      - cron
+      - systemd
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - make
+      - build-essential
+    state: present
+  tags: [system, packages]
+
+- name: Create hero system user
+  user:
+    name: hero
+    system: yes
+    home: /opt/hero
+    create_home: yes
+    shell: /bin/bash
+    comment: "Hero App System User"
+  tags: [users]
+
+- name: Create hero directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: hero
+    group: hero
+    mode: '0755'
+  loop:
+    - /opt/hero
+    - /opt/hero/bin
+    - /opt/hero/config
+    - /opt/hero/logs
+    - /opt/hero/scripts
+    - /opt/hero/backups
+    - /var/log/hero
+  tags: [directories]
+
+- name: Install Mycelium daemon
+  block:
+    - name: Download Mycelium binary
+      get_url:
+        url: "https://github.com/threefoldtech/mycelium/releases/download/v0.6.1/mycelium-x86_64-unknown-linux-musl.tar.gz"
+        dest: /tmp/mycelium-x86_64-unknown-linux-musl.tar.gz
+        mode: '0644'
+
+    - name: Extract Mycelium binary
+      unarchive:
+        src: /tmp/mycelium-x86_64-unknown-linux-musl.tar.gz
+        dest: /tmp
+        remote_src: yes
+
+    - name: Install Mycelium binary
+      copy:
+        src: /tmp/mycelium
+        dest: /usr/local/bin/mycelium
+        mode: '0755'
+        owner: root
+        group: root
+        remote_src: yes
+
+    - name: Verify Mycelium installation
+      command: /usr/local/bin/mycelium --version
+      register: mycelium_version
+
+    - name: Display Mycelium version
+      debug:
+        msg: "Mycelium installed: {{ mycelium_version.stdout }}"
+  tags: [mycelium, install]
+
+- name: Create mycelium system user
+  user:
+    name: mycelium
+    system: yes
+    home: /var/lib/mycelium
+    create_home: yes
+    shell: /bin/false
+    comment: "Mycelium Network Daemon"
+  tags: [mycelium, users]
+
+- name: Configure Mycelium daemon
+  template:
+    src: mycelium.service.j2
+    dest: /etc/systemd/system/mycelium.service
+    mode: '0644'
+    owner: root
+    group: root
+  notify:
+    - reload systemd
+    - restart mycelium
+  tags: [mycelium, service]
+
+- name: Create Mycelium configuration directory
+  file:
+    path: /etc/mycelium
+    state: directory
+    mode: '0755'
+    owner: mycelium
+    group: mycelium
+  tags: [mycelium, config]
+
+- name: Create Mycelium configuration
+  template:
+    src: mycelium-config.toml.j2
+    dest: /etc/mycelium/config.toml
+    mode: '0600'
+    owner: mycelium
+    group: mycelium
+  notify: restart mycelium
+  tags: [mycelium, config]
+
+- name: Enable and start Mycelium service
+  systemd:
+    name: mycelium
+    enabled: yes
+    state: started
+    daemon_reload: yes
+  tags: [mycelium, service]
+
+- name: Configure firewall base rules
+  ufw:
+    rule: "{{ item.rule }}"
+    port: "{{ item.port | default(omit) }}"
+    proto: "{{ item.proto | default(omit) }}"
+    src: "{{ item.src | default(omit) }}"
+    comment: "{{ item.comment }}"
+  loop:
+    - { rule: "allow", port: "22", proto: "tcp", src: "10.1.0.0/16", comment: "SSH from Hero network" }
+    - { rule: "allow", port: "8989", proto: "tcp", src: "127.0.0.1", comment: "Mycelium API local" }
+    - { rule: "deny", port: "22", proto: "tcp", comment: "Deny SSH from internet" }
+  tags: [firewall, security]
+
+- name: Configure fail2ban for SSH protection
+  template:
+    src: fail2ban-hero.conf.j2
+    dest: /etc/fail2ban/jail.d/hero.conf
+    mode: '0644'
+  notify: restart fail2ban
+  tags: [security, fail2ban]
+
+- name: Setup log rotation for Hero services
+  template:
+    src: hero-logrotate.j2
+    dest: /etc/logrotate.d/hero
+    mode: '0644'
+  tags: [logging]
+
+- name: Install Vlang
+  block:
+    - name: Clone Vlang repository
+      git:
+        repo: https://github.com/vlang/v
+        dest: /opt/v
+        depth: 1
+
+    - name: Build Vlang
+      command: make
+      args:
+        chdir: /opt/v
+
+    - name: Create V symlink
+      command: /opt/v/v symlink
+      become: yes
+
+    - name: Verify Vlang installation
+      command: /usr/local/bin/v version
+      register: v_version
+
+    - name: Display Vlang version
+      debug:
+        msg: "Vlang installed: {{ v_version.stdout }}"
+  tags: [vlang, install]
+
+- name: Set timezone to UTC
+  timezone:
+    name: UTC
+  tags: [system]
+
+- name: Configure NTP synchronization
+  systemd:
+    name: systemd-timesyncd
+    enabled: yes
+    state: started
+  tags: [system, time]
+
+- name: Create Hero environment file
+  template:
+    src: hero.env.j2
+    dest: /opt/hero/config/hero.env
+    mode: '0600'
+    owner: hero
+    group: hero
+  tags: [config, environment]

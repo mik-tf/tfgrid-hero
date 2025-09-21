@@ -1,0 +1,12 @@
+/var/log/hero/*.log {
+    daily
+    missingok
+    rotate 52
+    compress
+    delaycompress
+    notifempty
+    create 644 hero hero
+    postrotate
+        systemctl reload hero-monitor || true
+    endscript
+}

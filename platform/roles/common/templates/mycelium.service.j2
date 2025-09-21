@@ -1,0 +1,14 @@
+[Unit]
+Description=Mycelium Network Daemon
+After=network.target
+
+[Service]
+Type=simple
+User=mycelium
+Group=mycelium
+ExecStart=/usr/local/bin/mycelium --config /etc/mycelium/config.toml
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,47 @@
+---
+# Herolib Backend Role - Deploy herolib backend service
+
+- name: Clone herolib repository
+  git:
+    repo: https://github.com/freeflowuniverse/herolib
+    dest: /opt/herolib
+    version: development_heroserver
+    update: yes
+
+- name: Build herolib (if needed)
+  command: /usr/local/bin/v run compile.sh
+  args:
+    chdir: /opt/herolib
+  ignore_errors: yes  # May already be compiled
+
+- name: Create herolib systemd service
+  template:
+    src: herolib.service.j2
+    dest: /etc/systemd/system/herolib.service
+    mode: '0644'
+  notify:
+    - reload systemd
+    - restart herolib
+
+- name: Enable and start herolib service
+  systemd:
+    name: herolib
+    enabled: yes
+    state: started
+    daemon_reload: yes
+
+- name: Wait for herolib to start
+  wait_for:
+    port: "{{ hero_backend_port }}"
+    timeout: 30
+
+- name: Verify herolib is running
+  uri:
+    url: http://localhost:{{ hero_backend_port }}/health
+    method: GET
+  register: health_check
+  ignore_errors: yes
+
+- name: Display health check result
+  debug:
+    msg: "Herolib health check: {{ health_check.status if health_check.status is defined else 'N/A' }}"

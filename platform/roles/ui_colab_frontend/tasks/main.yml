@@ -1,0 +1,76 @@
+---
+# UI Colab Frontend Role - Deploy ui_colab frontend
+
+- name: Install Node.js 20 LTS repository
+  shell: |
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+  args:
+    creates: /etc/apt/sources.list.d/nodesource.list
+
+- name: Install Node.js
+  apt:
+    name: nodejs
+    state: present
+    update_cache: yes
+
+- name: Install pnpm
+  npm:
+    name: pnpm
+    global: yes
+    state: present
+
+- name: Verify Node.js and pnpm installation
+  command: "{{ item }}"
+  register: version_check
+  changed_when: false
+  loop:
+    - node --version
+    - pnpm --version
+
+- name: Display versions
+  debug:
+    msg: "{{ item.item }}: {{ item.stdout }}"
+  loop: "{{ version_check.results }}"
+
+- name: Clone ui_colab repository
+  git:
+    repo: https://github.com/freeflowuniverse/ui_colab
+    dest: /opt/ui_colab
+    version: main
+    update: yes
+
+- name: Install ui_colab dependencies
+  command: pnpm install
+  args:
+    chdir: /opt/ui_colab
+
+- name: Build ui_colab
+  command: pnpm run build
+  args:
+    chdir: /opt/ui_colab
+
+- name: Create nginx site configuration
+  template:
+    src: ui_colab.nginx.j2
+    dest: /etc/nginx/sites-available/ui_colab
+    mode: '0644'
+  notify: reload nginx
+
+- name: Enable ui_colab nginx site
+  file:
+    src: /etc/nginx/sites-available/ui_colab
+    dest: /etc/nginx/sites-enabled/ui_colab
+    state: link
+  notify: reload nginx
+
+- name: Disable default nginx site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: reload nginx
+
+- name: Ensure nginx is running
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes
