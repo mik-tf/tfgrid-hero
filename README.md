@@ -50,6 +50,20 @@ This repository contains the infrastructure and configuration for deploying the 
 4. **Configure DNS**:
    Point hero.projectmycelium.org to the VM's public IPv4 address.
 
+## Network Deployments
+
+**Test Network (Development)**:
+```bash
+export TF_VAR_tfgrid_network=test
+make deploy
+```
+
+**Production Network**:
+```bash
+export TF_VAR_tfgrid_network=main
+make prod-deploy  # Includes SSL setup
+```
+
 ## Local Development
 
 For local testing, follow these steps:

@@ -8,7 +8,8 @@ terraform {
 
 provider "grid" {
   mnemonics = var.mnemonics
-  network   = var.network
+  network   = var.tfgrid_network
+  relay_url = var.tfgrid_network == "main" ? "wss://relay.grid.tf" : "wss://relay.test.grid.tf"
 }
 
 variable "mnemonics" {
@@ -16,10 +17,15 @@ variable "mnemonics" {
   description = "The mnemonics of the account"
 }
 
-variable "network" {
+variable "tfgrid_network" {
   type        = string
   default     = "main"
-  description = "The network to deploy on (main, test, qa, dev)"
+  description = "ThreeFold Grid network (main, test, dev)"
+
+  validation {
+    condition     = contains(["main", "test", "dev"], var.tfgrid_network)
+    error_message = "Network must be one of: main, test, dev"
+  }
 }
 
 # Hero VM (herolib backend + ui_colab frontend + redis + nginx)
@@ -79,4 +85,9 @@ output "vm_mycelium_ip" {
 output "wg_config" {
   value = grid_deployment.hero.vms[0].wireguard_config
   sensitive = true
+}
+
+output "tfgrid_network" {
+  value       = var.tfgrid_network
+  description = "ThreeFold Grid network (main, test, dev)"
 }

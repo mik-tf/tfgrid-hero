@@ -209,3 +209,23 @@ status:
 	else \
 		echo "📋 Inventory: ❌ Not generated"; \
 	fi
+
+# Test network deployment
+dev-deploy:
+	@echo "🧪 Deploying Hero app to test network..."
+	@export TF_VAR_tfgrid_network=test && make deploy
+
+# SSL-enabled deployment
+ssl-deploy: infrastructure inventory wg set-dns platform ssl-setup verify
+	@echo "🔒 SSL-enabled Hero app deployment completed!"
+
+# Production deployment with SSL
+prod-deploy:
+	@echo "🏭 Deploying Hero app to production..."
+	@if [ -f .env ]; then set -a && . ./.env && set +a; fi; \
+	if [ -z "$$DOMAIN_NAME" ] || [ "$$ENABLE_SSL" != "true" ]; then \
+		echo "❌ Error: Production deployment requires DOMAIN_NAME and ENABLE_SSL=true"; \
+		echo "   Configure in .env file"; \
+		exit 1; \
+	fi
+	@export TF_VAR_tfgrid_network=main && make ssl-deploy
