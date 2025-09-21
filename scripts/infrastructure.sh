@@ -148,6 +148,9 @@ apply_infrastructure() {
     fi
 }
 
+# Global variables for VM information
+VM_PUBLIC_IP=""
+
 # Display deployment results
 show_results() {
     log_info "Deployment results:"
@@ -222,7 +225,7 @@ main() {
     echo ""
     log_success "🎉 Hero app infrastructure deployment completed successfully!"
     echo ""
-    echo "📍 Your Hero app gateway is available at: $GATEWAY_PUBLIC_IP"
+    echo "📍 Your Hero app is available at: $VM_PUBLIC_IP"
     echo "🔧 Continue with: make platform"
 }
 
