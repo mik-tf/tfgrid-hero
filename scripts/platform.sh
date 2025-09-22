@@ -211,7 +211,7 @@ deploy_services() {
     # Run Ansible playbook
     log_info "Executing Ansible playbook..."
     
-    if ansible-playbook -i inventory.ini site.yml --extra-vars "$EXTRA_VARS" -v; then
+    if ansible-playbook -i inventory.ini playbook.yml --extra-vars "$EXTRA_VARS" -v; then
         log_success "Hero app services deployed successfully"
     else
         log_error "Hero app service deployment failed"
@@ -345,25 +345,25 @@ case "${1:-}" in
         log_info "Deploying gateway services only..."
         cd "$PLATFORM_DIR"
         load_env_config
-        ansible-playbook -i inventory.ini site.yml --limit gateway --extra-vars "network_mode=${NETWORK_MODE:-both} gateway_type=${GATEWAY_TYPE:-gateway_proxy} enable_ssl=${ENABLE_SSL:-false}"
+        ansible-playbook -i inventory.ini playbook.yml --limit gateway --extra-vars "network_mode=${NETWORK_MODE:-both} gateway_type=${GATEWAY_TYPE:-gateway_proxy} enable_ssl=${ENABLE_SSL:-false}"
         ;;
     "database-only")
         log_info "Deploying database services only..."
         cd "$PLATFORM_DIR"
         load_env_config
-        ansible-playbook -i inventory.ini site.yml --limit database --extra-vars "postgres_password=${POSTGRES_PASSWORD} redis_password=${REDIS_PASSWORD} jwt_secret=${JWT_SECRET}"
+        ansible-playbook -i inventory.ini playbook.yml --limit database --extra-vars "postgres_password=${POSTGRES_PASSWORD} redis_password=${REDIS_PASSWORD} jwt_secret=${JWT_SECRET}"
         ;;
     "storage-only")
         log_info "Deploying storage services only..."
         cd "$PLATFORM_DIR"
         load_env_config
-        ansible-playbook -i inventory.ini site.yml --limit storage --extra-vars "network_mode=${NETWORK_MODE:-both}"
+        ansible-playbook -i inventory.ini playbook.yml --limit storage --extra-vars "network_mode=${NETWORK_MODE:-both}"
         ;;
     "app-only")
         log_info "Deploying app services only..."
         cd "$PLATFORM_DIR"
         load_env_config
-        ansible-playbook -i inventory.ini site.yml --limit app --extra-vars "network_mode=${NETWORK_MODE:-both} enable_ssl=${ENABLE_SSL:-false} domain_name=${DOMAIN_NAME:-}"
+        ansible-playbook -i inventory.ini playbook.yml --limit app --extra-vars "network_mode=${NETWORK_MODE:-both} enable_ssl=${ENABLE_SSL:-false} domain_name=${DOMAIN_NAME:-}"
         ;;
     *)
         main "$@"
