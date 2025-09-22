@@ -77,6 +77,11 @@
     - { rule: "deny", port: "22", proto: "tcp", comment: "Deny SSH from internet" }
   tags: [firewall, security]
 
+- name: Enable UFW firewall
+  ufw:
+    state: enabled
+  tags: [firewall, security]
+
 - name: Configure fail2ban for SSH protection
   template:
     src: fail2ban-hero.conf.j2
