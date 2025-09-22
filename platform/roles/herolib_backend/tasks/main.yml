@@ -8,10 +8,21 @@
     version: development_heroserver
     update: yes
 
+- name: Clean up previous compilation logs
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /opt/herolib/compile_results.log
+    - /opt/herolib/compile_summary.log
+  ignore_errors: yes
+
 - name: Build herolib (if needed)
   command: bash compile.sh
   args:
     chdir: /opt/herolib
+  become: yes
+  become_user: hero
   ignore_errors: yes  # May already be compiled
 
 - name: Create herolib systemd service
