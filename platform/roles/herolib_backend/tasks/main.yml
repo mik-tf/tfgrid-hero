@@ -1,6 +1,10 @@
 ---
 # Herolib Backend Role - Deploy herolib backend service
 
+- name: Configure git safe directory for herolib
+  command: git config --global --add safe.directory /opt/herolib
+  ignore_errors: yes
+
 - name: Clone herolib repository
   git:
     repo: https://github.com/freeflowuniverse/herolib
@@ -8,13 +12,14 @@
     version: development_heroserver
     update: yes
 
-- name: Clean up previous compilation logs
+- name: Clean up previous compilation artifacts
   file:
     path: "{{ item }}"
     state: absent
   loop:
     - /opt/herolib/compile_results.log
     - /opt/herolib/compile_summary.log
+    - /opt/herolib/.compile_cache
   ignore_errors: yes
 
 - name: Build herolib (if needed)
