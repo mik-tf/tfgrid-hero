@@ -21,9 +21,15 @@
   command: bash compile.sh
   args:
     chdir: /opt/herolib
-  become: yes
-  become_user: hero
   ignore_errors: yes  # May already be compiled
+
+- name: Ensure compiled files are owned by hero user
+  file:
+    path: /opt/herolib
+    owner: hero
+    group: hero
+    recurse: yes
+  ignore_errors: yes
 
 - name: Create herolib systemd service
   template:
