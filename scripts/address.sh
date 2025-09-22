@@ -38,7 +38,7 @@ VM_MYCELIUM_IP=$($TERRAFORM_CMD output -raw vm_mycelium_ip 2>/dev/null || echo "
 
 echo -e "${YELLOW}🌐 Public Access:${NC}"
 if [ "$VM_PUBLIC_IP" != "N/A" ] && [ "$VM_PUBLIC_IP" != "null" ]; then
-    echo "  Hero App: http://$VM_PUBLIC_IP"
+    echo "  Hero App: $VM_PUBLIC_IP"
 else
     echo "  VM: Not deployed yet (run: make infrastructure)"
 fi
