@@ -31,6 +31,25 @@
     recurse: yes
   ignore_errors: yes
 
+- name: Create V modules directory for hero user
+  file:
+    path: /opt/hero/.vmodules/freeflowuniverse
+    owner: hero
+    group: hero
+    state: directory
+    recurse: yes
+  ignore_errors: yes
+
+- name: Create V modules symlink for hero user
+  file:
+    src: /opt/herolib/lib
+    dest: /opt/hero/.vmodules/freeflowuniverse/herolib
+    owner: hero
+    group: hero
+    state: link
+    force: yes
+  ignore_errors: yes
+
 - name: Create herolib systemd service
   template:
     src: herolib.service.j2

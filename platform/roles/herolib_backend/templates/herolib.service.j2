@@ -11,6 +11,9 @@ ExecStart=/usr/local/bin/v run /opt/herolib/examples/hero/heromodels/heroserver_
 Restart=always
 Environment=HOME=/opt/hero
 Environment=PATH=/usr/local/bin:/usr/bin:/bin
+Environment=DOMAIN_NAME={{ domain_name | default('') }}
+Environment=ENABLE_SSL={{ enable_ssl | default('false') }}
+Environment=REDIS_PASSWORD={{ redis_password | default('') }}
 
 [Install]
 WantedBy=multi-user.target
