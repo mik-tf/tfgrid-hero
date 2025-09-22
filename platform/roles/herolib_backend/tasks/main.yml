@@ -55,6 +55,14 @@
     force: yes
   ignore_errors: yes
 
+- name: Copy custom heroserver script
+  copy:
+    src: ../../../../scripts/heroserver.vsh
+    dest: /opt/hero/scripts/heroserver.vsh
+    mode: '0755'
+    owner: hero
+    group: hero
+
 - name: Create herolib systemd service
   template:
     src: herolib.service.j2
