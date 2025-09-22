@@ -72,9 +72,8 @@
     src: "{{ item.src | default(omit) }}"
     comment: "{{ item.comment }}"
   loop:
-    - { rule: "allow", port: "22", proto: "tcp", src: "10.1.0.0/16", comment: "SSH from Hero network" }
+    - { rule: "allow", port: "22", proto: "tcp", comment: "SSH access for deployment" }
     - { rule: "allow", port: "8989", proto: "tcp", src: "127.0.0.1", comment: "Mycelium API local" }
-    - { rule: "deny", port: "22", proto: "tcp", comment: "Deny SSH from internet" }
   tags: [firewall, security]
 
 - name: Enable UFW firewall

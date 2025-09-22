@@ -9,7 +9,7 @@
     update: yes
 
 - name: Build herolib (if needed)
-  command: /usr/local/bin/v run compile.sh
+  command: bash compile.sh
   args:
     chdir: /opt/herolib
   ignore_errors: yes  # May already be compiled
