@@ -34,10 +34,12 @@
 
 - name: Clone ui_colab repository
   git:
-    repo: https://github.com/freeflowuniverse/ui_colab
+    repo: https://git.ourworld.tf/herocode/ui_colab
     dest: /opt/ui_colab
     version: main
     update: yes
+    username: git
+    password: "{{ lookup('env', 'gitea_token') }}"
 
 - name: Install ui_colab dependencies
   command: pnpm install

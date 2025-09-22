@@ -17,6 +17,7 @@ This repository contains the infrastructure and configuration for deploying the 
 - TFGrid account with mnemonics
 - SSH key pair
 - Domain DNS access (for hero.projectmycelium.org)
+- Gitea token for ui_colab repository access (stored in `~/.config/threefold/gitea_token`)
 
 ## Quick Start
 
@@ -32,27 +33,32 @@ This repository contains the infrastructure and configuration for deploying the 
    Edit `infrastructure/credentials.auto.tfvars` with your TFGrid node ID.
    Edit `.env` with your domain and settings.
 
-3. **Deploy complete stack**:
+3. **Set environment variables**:
    ```bash
-   export TF_VAR_mnemonic="your twelve word mnemonic"
+   export TF_VAR_mnemonic="$(cat ~/.config/threefold/mnemonic)"
+   export gitea_token="$(cat ~/.config/threefold/gitea_token)"
+   ```
+
+4. **Deploy complete stack**:
+   ```bash
    make deploy
    ```
 
-   **Quick redeploy (if infrastructure exists)**:
-   ```bash
-   make quick
-   ```
+    **Quick redeploy (if infrastructure exists)**:
+    ```bash
+    make quick
+    ```
 
-   Or step by step:
-   ```bash
-   make infrastructure  # Deploy VM
-   make inventory       # Generate Ansible inventory
-   make wg             # Setup WireGuard (optional)
-   make platform       # Deploy services
-   make verify         # Verify deployment
-   ```
+    Or step by step:
+    ```bash
+    make infrastructure  # Deploy VM
+    make inventory       # Generate Ansible inventory
+    make wg             # Setup WireGuard (optional)
+    make platform       # Deploy services
+    make verify         # Verify deployment
+    ```
 
-4. **Configure DNS**:
+5. **Configure DNS**:
    Point hero.projectmycelium.org to the VM's public IPv4 address.
 
 ## Network Deployments
