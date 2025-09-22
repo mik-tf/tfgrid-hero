@@ -1,4 +1,4 @@
-#!/usr/bin/env -S v -n -w -gc none -cc tcc -d use_openssl -enable-globals -no-skip-unused run
+#!/usr/bin/env -S v -enable-globals -n -w -gc none -cc tcc -d use_openssl -no-skip-unused run
 
 import freeflowuniverse.herolib.hero.heromodels
 import freeflowuniverse.herolib.hero.db
