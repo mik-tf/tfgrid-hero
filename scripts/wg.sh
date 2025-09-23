@@ -34,6 +34,13 @@ wg_config=$(jq -r '.values.outputs.wg_config.value' <<< "$terraform_output")
 WG_CONFIG_FILE="/etc/wireguard/hero.conf"
 echo "$wg_config" | sudo tee "$WG_CONFIG_FILE" > /dev/null
 
+# Force cleanup of any existing WireGuard interface
+sudo ip link delete hero 2>/dev/null || true
+
+# Clean up any existing routes
+sudo ip route del 100.64.0.0/16 2>/dev/null || true
+sudo ip route del 10.1.0.0/16 2>/dev/null || true
+
 # Bring down the WireGuard interface if it's up
 sudo wg-quick down hero 2>/dev/null || true
 
